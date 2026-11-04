@@ -1,0 +1,9 @@
+{
+    "BTC": "bitcoin",
+    "ETH": "ethereum",
+    "SOL": "solana",
+    "ADA": "cardano",
+    "LINK": "chainlink",
+    "XRP": "ripple",
+    "ASTER": "aster-2"
+}

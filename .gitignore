@@ -1,0 +1,93 @@
+# ============================================
+# SECRETS & CREDENTIALS — NEVER COMMIT
+# ============================================
+.env
+.env.*
+!.env.example
+*.session
+*.session-journal
+redpill_news_session.session
+telegram_login_qr.png
+
+# ============================================
+# PERSONAL / FINANCIAL DATA
+# ============================================
+# Личный портфель, суммы, PnL, история сделок
+portfolio.json
+
+# Локальная (hot) история диалогов с агентом
+knowledge_base/chat_history.json
+
+# ============================================
+# THIRD-PARTY INTELLECTUAL PROPERTY
+# ============================================
+# Статья наставника — не наша, не публикуем
+knowledge_base/mentor/
+
+# Спарсенные новости из приватного Telegram-канала
+knowledge_base/news/
+
+# ============================================
+# GENERATED / DERIVED ARTIFACTS
+# ============================================
+# Дампы базы знаний (создаются scripts/dump_chunks.py)
+knowledge_base/chunks_dump.json
+knowledge_base/chunks_dump.md
+
+# Визуализации эмбеддингов (scripts/visualize_embeddings.py)
+knowledge_base/umap.png
+knowledge_base/tsne.png
+
+# Рантайм-хранилище Qdrant (бинарные снапшоты, гигабайты)
+qdrant_storage/
+
+
+# ============================================
+# PYTHON
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+.python-version
+
+# ============================================
+# TESTING / LINTING / TYPE-CHECKING
+# ============================================
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ============================================
+# LOGS
+# ============================================
+*.log
+logs/
+bot.log
+
+# ============================================
+# macOS
+# ============================================
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# ============================================
+# IDEs / EDITORS
+# ============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
