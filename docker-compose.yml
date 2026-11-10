@@ -16,4 +16,9 @@ services:
       - qdrant
     env_file:
       - .env
+    volumes:
+      - ./hf_cache:/root/.cache
+    environment:
+      - HF_HOME=/root/.cache/huggingface
+      - FASTEMBED_CACHE_PATH=/root/.cache/fastembed
     restart: unless-stopped
