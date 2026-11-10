@@ -49,7 +49,7 @@ TELEGRAM_APP_VERSION = "4.15.2"
 TELEGRAM_FETCH_LIMIT = 1000
 
 # --- Векторная база данных (Qdrant) ---
-QDRANT_HOST = "http://localhost:6333"
+QDRANT_HOST = os.getenv("QDRANT_HOST", "http://localhost:6333")
 QDRANT_TRADING_COLLECTION = "trading_memory"
 QDRANT_NEWS_COLLECTION = "news_memory"
 QDRANT_KNOWLEDGE_COLLECTION = "knowledge_memory"

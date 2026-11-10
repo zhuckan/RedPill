@@ -389,7 +389,6 @@ def _fix_risk_reward(result: Dict[str, Any], market_snapshot: str = "") -> Dict[
     if direction not in ("long", "short"):
         return result
 
-    # Извлекаем исходные числа
     entry_prices = _extract_prices(trading.get("entry"))
     stop_prices = _extract_prices(trading.get("stop_loss"))
     tp_list = trading.get("take_profit") or []
@@ -510,7 +509,6 @@ def _force_wait(
 
     trading["direction"] = "wait"
     trading["risk_reward"] = 0
-    # Очищаем числовые поля плана — formatters покажет "ждём зону $X"
     trading["entry"] = None
     trading["stop_loss"] = f"${stop:,.0f}"
     trading["take_profit"] = [f"${tp1:,.0f}"] + [
@@ -793,7 +791,6 @@ def verify_node(state: AgentState) -> Dict[str, Any]:
         logger.error(f"Ошибка верификации: {e}")
         result = draft
 
-    # Передаём market_snapshot в guard (нужен current_price BTC)
     result = _fix_risk_reward(result, market_snapshot=state.get("market_snapshot", ""))
 
     return {
@@ -847,7 +844,7 @@ def generate_ai_prediction(
     """Запускает граф агента и возвращает финальный прогноз."""
     config = {
         "callbacks": [langfuse_handler],
-        "metadata": {"langfuse_session_id": session_id}
+        "metadata": {"langfuse_session_id": session_id},
     }
 
     journal = portfolio.get("journal", []) if isinstance(portfolio, dict) else []

@@ -289,16 +289,16 @@ async def handle_feedback(message: Message, point_id: int, text: str) -> None:
 
 ПРАВИЛА:
 1. verdict — одно из трёх значений: "Сработал", "Не сработал", "Частично сработал".
-   - Если пользователь говорит "ты был прав", "сработал", "угадал", "молодец", "как и предсказал" -> "Сработал"
+   - Если пользователь говорит, что цена дошла до цели, но потом упала/выросла обратно, или говорит "почти", "частично", "не идеально", "но через день упали" -> "Частично сработал"
+   - Если "ты был прав", "сработал", "угадал", "как и предсказал" и цена дошла до цели -> "Сработал"
    - Если "не сработал", "ошибся", "не угадал", "не прав", "противоположное" -> "Не сработал"
-   - Если "частично", "немного", "почти", "дошло до X но не до Y" -> "Частично сработал"
-2. summary — краткое резюме в 1-2 предложениях.
+2. summary — краткое резюме В 1-2 ПРЕДЛОЖЕНИЯХ (что произошло по факту, без воды, максимум 200 символов).
 
 ТЕКСТ ПОЛЬЗОВАТЕЛЯ:
 \"\"\"{text}\"\"\"
 
 ПРИМЕР:
-{{"verdict": "Сработал", "summary": "Цена выросла до $150k. Прогноз подтвердился."}}
+{{"verdict": "Частично сработал", "summary": "Цена дошла до зоны входа 78133, дала рост до 81100, но затем откатилась до 76000."}}
 
 ТВОЙ ОТВЕТ (только JSON):"""
 
@@ -309,24 +309,37 @@ async def handle_feedback(message: Message, point_id: int, text: str) -> None:
     try:
         resp = analysis_llm.invoke([HumanMessage(content=extract_prompt)])
         raw = resp.content if isinstance(resp.content, str) else str(resp.content)
+        raw = raw.strip()
+
+        # Чистим возможные markdown-обертки ```json ... ```
+        if "```json" in raw:
+            raw = raw.split("```json")[1].split("```")[0]
+        elif "```" in raw:
+            raw = raw.split("```")[1].split("```")[0]
 
         m = re.search(r"\{.*\}", raw, re.DOTALL)
         if m:
             json_str = m.group(0)
+            # Простая чистка от возможных артефактов
             json_str = json_str.replace("'", '"')
-            json_str = re.sub(r'(\w+)\s*:', r'"\1":', json_str)
-            json_str = json_str.replace('""', '"')
             data = json.loads(json_str)
             verdict = data.get("verdict", "Частично сработал")
             summary = data.get("summary", text[:200])
+
     except Exception as e:
-        logger.error(f"Ошибка парсинга фидбека: {e}")
+        logger.error(f"Ошибка парсинга фидбека: {e}. Raw: {raw[:200]}")
         tl = text.lower()
-        if any(k in tl for k in ["ты был прав", "сработал", "угадал", "как и предсказ", "молодец"]):
-            verdict = "Сработал"
+
+        # ВАЖНО: Сначала проверяем на "частично", чтобы не сработало правило "сработал"
+        if any(k in tl for k in ["частично", "почти", "не идеально", "но через", "но потом", "откатилась"]):
+            verdict = "Частично сработал"
         elif any(k in tl for k in ["не сработал", "ошибся", "не угадал", "не прав"]):
             verdict = "Не сработал"
-        summary = text[:200]
+        elif any(k in tl for k in ["ты был прав", "сработал", "угадал", "как и предсказ", "молодец"]):
+            verdict = "Сработал"
+
+        # Если LLM упала, делаем резюме хотя бы чуть чище
+        summary = f"Фидбек: {text[:150]}..."
 
     ok = await asyncio.to_thread(update_prediction_outcome, point_id, summary, verdict)
 
