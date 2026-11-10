@@ -1,0 +1,16 @@
+aiogram>=3.0.0
+langchain-core
+langchain-google-genai
+langgraph
+exa_py
+qdrant-client
+fastembed
+langfuse
+requests
+yfinance
+pandas
+telethon
+qrcode[pil]
+fastapi
+uvicorn
+python-dotenv
